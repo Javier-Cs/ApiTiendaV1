@@ -140,9 +140,10 @@ namespace ApiTiendaV1.Repositorios.ClienteRop
         public async Task<IEnumerable<ClienteSearchDto>> BuscarCliAsync(string nombre, CancellationToken ct = default) {
 
             const string sqlb = @"
-                        select id_cliente, nombre 
+                        select top 10 id_cliente, nombre 
                         from clientes where nombre 
-                        like @nombre;";
+                        like '%'+@nombre+'%' 
+                        order by nombre;";
 
             using var connection = _sqlconnection.CreateConnection();
             var clientes  = await connection.QueryAsync<ClienteSearchDto>(

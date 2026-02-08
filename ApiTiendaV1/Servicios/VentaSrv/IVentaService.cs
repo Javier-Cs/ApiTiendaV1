@@ -14,5 +14,6 @@ namespace ApiTiendaV1.Servicios.VentaSrv
         Task<IEnumerable<VentaDto>> Obtener_TodasVentConDeudaAsync(CancellationToken ct = default);
         Task<IEnumerable<VentaDto>> Obtener_VentasPorClienteAsync(int idcliente, CancellationToken ct = default);
         Task<IEnumerable<VentaDto>> Obtener_VentDeudaPorClienteAsync(int idCliente, string estadoVenta, string tipoVenta, CancellationToken ct = default);
+        Task<bool> ActualizarVentaAsync(int idVenta, VentaUpDto dto , CancellationToken ct = default);
     }
 }

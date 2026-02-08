@@ -77,5 +77,36 @@ namespace ApiTiendaV1.Servicios.VentaSrv
 
         public Task<IEnumerable<VentaDto>> Obtener_VentasPorClienteAsync(int idcliente, CancellationToken ct = default)
             => _ventaRepo.ObtenerVentasPorClienteAsync(idcliente, ct);
+
+        public async Task<bool> ActualizarVentaAsync(int idVenta, VentaUpDto dto, CancellationToken ct = default)
+        {
+            var venta = await _ventaRepo.ObtenerVenPorIdVenAsync(idVenta, ct);
+            if (venta == null) {
+                throw new KeyNotFoundException("venta no encontrada");
+            }
+            if (dto.descripcion_venta == null && dto.tipo_venta == null && dto.efectivo_recibido == null
+                && dto.monto_total_Venta == null ) 
+            {
+                throw new ArgumentException("No hay datos para actualizar..");
+            }
+
+            if (dto.monto_total_Venta.HasValue && dto.monto_total_Venta < 0)
+                throw new ArgumentException("El monto total no puede ser negativo.");
+
+            if (dto.efectivo_recibido.HasValue && dto.efectivo_recibido < 0)
+                throw new ArgumentException("El efectivo recibido no puede ser negativo.");
+
+            //if (dto.monto_vuelto < 0)
+            //    throw new ArgumentException("El vuelto no puede ser negativo.");
+
+            if (dto.efectivo_recibido.HasValue && dto.monto_total_Venta.HasValue && 
+                dto.efectivo_recibido < dto.monto_total_Venta)
+                throw new InvalidOperationException("El efectivo recibido es insuficiente.");
+
+            //dto.monto_vuelto = dto.efectivo_recibido - dto.monto_total_Venta;
+
+            return await _ventaRepo.ActualizarVentaAsync(idVenta, dto, ct);
+            
+        }
     }
 }

@@ -180,5 +180,53 @@ namespace ApiTiendaV1.Repositorios.VentaRop
 
             return ventaPorCliente.AsList();
         }
+
+        public async Task<bool> ActualizarVentaAsync(int idVenta, VentaUpDto dto, CancellationToken ct = default)
+        {
+            var updates = new List<string>();
+
+            if (dto.descripcion_venta != null)
+                updates.Add("descripcion_venta = @descripcion_venta");
+
+            if (dto.tipo_venta != null)
+                updates.Add("tipo_venta = @tipo_venta");
+
+            if (dto.efectivo_recibido != null)
+                updates.Add("efectivo_recibido = @efectivo_recibido");
+
+            if (dto.monto_total_Venta != null)
+                updates.Add("monto_total_Venta = @monto_total_Venta");
+
+            decimal? vuelto = null;
+            if (dto.efectivo_recibido.HasValue && dto.monto_total_Venta.HasValue) {
+                vuelto = dto.efectivo_recibido.Value - dto.monto_total_Venta.Value;
+                updates.Add("monto_vuelto = @vuelto");
+            }
+
+            var sql = $@"
+                UPDATE ventas
+                SET {string.Join(", ", updates)}
+                WHERE id_venta = @idVenta";
+
+            using var connection = _sqlconnection.CreateConnection();
+
+            var rows = await connection.ExecuteAsync(
+                new CommandDefinition(
+                    sql,
+                    new
+                    {
+                        idVenta,
+                        dto.descripcion_venta,
+                        dto.tipo_venta,
+                        dto.efectivo_recibido,
+                        dto.monto_total_Venta,
+                        vuelto
+                    },
+                    cancellationToken: ct
+                )
+            );
+
+            return rows > 0;
+        }
     }
 }

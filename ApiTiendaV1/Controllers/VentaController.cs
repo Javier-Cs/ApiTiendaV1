@@ -85,6 +85,12 @@ namespace ApiTiendaV1.Controllers
             return NoContent();
         }
 
+        [HttpPut]
+        public async Task<IActionResult> ActualizarOneVent([FromQuery]int ventaId, [FromBody] VentaUpDto dto, CancellationToken ct) { 
+            await _ventaService.ActualizarVentaAsync(ventaId, dto, ct);
+            return Ok(dto);
+        }
+
 
 
         [HttpOptions]

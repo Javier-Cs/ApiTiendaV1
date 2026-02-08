@@ -85,9 +85,11 @@ namespace ApiTiendaV1.Controllers
             return Ok();
         }
 
-        [HttpGet("{tipoclientes}")]
-        public async Task<IActionResult> BuscarCliente(string tipoclientes,CancellationToken ct){
-            var clientes = await _clienteService.Buscar_CliAsync(tipoclientes, ct);
+        [HttpGet("buscar")]
+        public async Task<IActionResult> BuscarCliente([FromQuery]string nombre,CancellationToken ct){
+            if (string.IsNullOrWhiteSpace(nombre) || nombre.Length < 2)
+                return Ok(Enumerable.Empty<ClienteSearchDto>);
+            var clientes = await _clienteService.Buscar_CliAsync(nombre, ct);
             return Ok(clientes);
         }
     }
