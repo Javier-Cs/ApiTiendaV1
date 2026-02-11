@@ -1,7 +1,9 @@
 using ApiTiendaV1.Data;
 using ApiTiendaV1.Repositorios.ClienteRop;
+using ApiTiendaV1.Repositorios.PagoRop;
 using ApiTiendaV1.Repositorios.VentaRop;
 using ApiTiendaV1.Servicios.ClienteSrv;
+using ApiTiendaV1.Servicios.PagoSrv;
 using ApiTiendaV1.Servicios.VentaSrv;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,8 +19,11 @@ builder.Services.AddScoped<ISqlConnectionFactory, SqlConnectionFactory>();
 
 builder.Services.AddScoped<IClienteRepo, ClienteRepo>();
 builder.Services.AddScoped<IVentaRepo, VentaRepo>();
+builder.Services.AddScoped<IPagoRepo, PagoRepo>(); 
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IVentaService, VentaService>();
+builder.Services.AddScoped<IPagoService, PagoService>();
+
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAstroApp",
