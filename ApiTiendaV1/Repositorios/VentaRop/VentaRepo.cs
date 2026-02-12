@@ -16,6 +16,12 @@ namespace ApiTiendaV1.Repositorios.VentaRop
 
         public async Task<int> CrearVenAsync(VentaCrearDto dto, CancellationToken ct = default)
         {
+            string estado_venta = "";
+            if (dto.tipo_venta == TipoVenta.Contado) {
+                estado_venta = EstadoVenta.Pagado;
+            } else if (dto.tipo_venta == TipoVenta.Credito) {
+                estado_venta = EstadoVenta.Deuda;
+            }
             const string sql = @"
                 INSERT INTO ventas (
                     id_cliente,
@@ -25,8 +31,7 @@ namespace ApiTiendaV1.Repositorios.VentaRop
                     estado_venta,
                     efectivo_recibido,
                     monto_total_Venta,
-                    monto_vuelto,
-                    fecha_venta
+                    monto_vuelto
                 )
                 VALUES (
                     @id_cliente,
@@ -36,15 +41,24 @@ namespace ApiTiendaV1.Repositorios.VentaRop
                     @estado_venta,
                     @efectivo_recibido,
                     @monto_total_Venta,
-                    @monto_vuelto,
-                    @fecha_venta
+                    @monto_vuelto
                 );
 
                 SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
             using var connection = _sqlconnection.CreateConnection();
             return await connection.ExecuteScalarAsync<int>(
-                new CommandDefinition(sql, dto, cancellationToken: ct)
+                new CommandDefinition(sql, 
+                new {
+                    dto.id_cliente,
+                    dto.nombre_vendedor,
+                    dto.descripcion_venta,
+                    dto.tipo_venta,
+                    estado_venta,               // 👈 AQUÍ está la clave
+                    dto.efectivo_recibido,
+                    dto.monto_total_Venta,
+                    dto.monto_vuelto
+                }, cancellationToken: ct)
             );
         }
 

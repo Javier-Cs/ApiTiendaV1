@@ -23,7 +23,6 @@ namespace ApiTiendaV1.Controllers
             [FromBody] VentaCrearDto dto,
             CancellationToken ct)
         {
-            dto.fecha_venta = DateTime.UtcNow;
             var id = await _ventaService.Crear_VentAsync(dto, ct);
             return CreatedAtAction(nameof(ObtenerPorId),
                 new { idVenta = id, idCliente = dto.id_cliente },

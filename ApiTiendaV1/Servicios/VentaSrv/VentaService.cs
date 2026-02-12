@@ -28,16 +28,18 @@ namespace ApiTiendaV1.Servicios.VentaSrv
 
             if (dto.tipo_venta == TipoVenta.Contado)
             {
+
                 if (dto.efectivo_recibido < dto.monto_total_Venta)
                     throw new ArgumentException("El efectivo recibido es insuficiente");
 
                 dto.monto_vuelto = dto.efectivo_recibido - dto.monto_total_Venta;
-                dto.estado_venta = EstadoVenta.Pagado;
+                //dto.estado_venta = EstadoVenta.Pagado;
             }
             else if (dto.tipo_venta == TipoVenta.Credito)
             {
+                dto.efectivo_recibido = dto.monto_total_Venta;
                 dto.monto_vuelto = 0;
-                dto.estado_venta = EstadoVenta.Deuda;
+                //dto.estado_venta = EstadoVenta.Deuda;
             }
             else
             {
