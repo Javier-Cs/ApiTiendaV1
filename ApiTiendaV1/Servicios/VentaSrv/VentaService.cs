@@ -35,6 +35,9 @@ namespace ApiTiendaV1.Servicios.VentaSrv
                 dto.monto_vuelto = dto.efectivo_recibido - dto.monto_total_Venta;
                 //dto.estado_venta = EstadoVenta.Pagado;
             }
+            else if (dto.tipo_venta == TipoVenta.Contado && dto.efectivo_recibido == 0) {
+                dto.monto_vuelto = 0;
+            }
             else if (dto.tipo_venta == TipoVenta.Credito)
             {
                 dto.efectivo_recibido = dto.monto_total_Venta;

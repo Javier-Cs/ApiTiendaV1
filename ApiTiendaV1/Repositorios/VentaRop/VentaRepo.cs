@@ -22,6 +22,9 @@ namespace ApiTiendaV1.Repositorios.VentaRop
             } else if (dto.tipo_venta == TipoVenta.Credito) {
                 estado_venta = EstadoVenta.Deuda;
             }
+            if (dto.efectivo_recibido == 0) {
+                dto.monto_vuelto = 0;
+            }
             const string sql = @"
                 INSERT INTO ventas (
                     id_cliente,
@@ -54,7 +57,7 @@ namespace ApiTiendaV1.Repositorios.VentaRop
                     dto.nombre_vendedor,
                     dto.descripcion_venta,
                     dto.tipo_venta,
-                    estado_venta,               // 👈 AQUÍ está la clave
+                    estado_venta,               // 
                     dto.efectivo_recibido,
                     dto.monto_total_Venta,
                     dto.monto_vuelto
