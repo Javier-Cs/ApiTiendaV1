@@ -93,8 +93,21 @@ namespace ApiTiendaV1.Controllers
 
         [HttpPost("/FechaVenta")]
         public async Task<IActionResult> BuscarPorFecha([FromBody] BuscarVenta buscarVenta, CancellationToken ct) {
-            var resultado = await _ventaService.Obtener_Vent_por_FechaAsync(buscarVenta, ct);
-            return Ok(resultado);
+
+            try
+            {
+                var resultado = await _ventaService.Obtener_Vent_por_FechaAsync(buscarVenta, ct);
+                return Ok(resultado);
+            }
+            catch (ArgumentException ex) {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+            catch (KeyNotFoundException ex) {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+            catch (InvalidOperationException ex) {
+                return BadRequest(new { mensaje = ex.Message });
+            }
         }
 
 

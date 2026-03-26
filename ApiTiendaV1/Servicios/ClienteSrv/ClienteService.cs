@@ -54,9 +54,18 @@ namespace ApiTiendaV1.Servicios.ClienteSrv
             return await _clienteRepo.EliminarCliAsync(idCliente, ct);
         }
 
-        public Task<ClienteCompleDto?> Obtener_CliPorIdAsync(int idCliente, CancellationToken ct = default)
+        public async Task<ClienteCompleDto?> Obtener_CliPorIdAsync(int idCliente, CancellationToken ct = default)
         {
-           return  _clienteRepo.ObtenerCliPorIdAsync(idCliente, ct);
+            if (idCliente < 0)
+                throw new ArgumentException("El cliente deber ser mayor a 0");
+            var cliente = await _clienteRepo.ObtenerCliPorIdAsync(idCliente, ct);
+
+            if (cliente is null)
+                throw new KeyNotFoundException($"No se encontro el cliente con id {idCliente}");
+            if (!cliente.estado)
+                throw new InvalidOperationException("El cliente no está activo");
+
+            return cliente;
         }
 
         public Task<IEnumerable<ClienteDto>> ObtenerTodos_LosCliAsync(CancellationToken ct = default)

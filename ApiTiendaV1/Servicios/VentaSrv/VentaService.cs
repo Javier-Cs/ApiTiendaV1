@@ -3,6 +3,7 @@ using ApiTiendaV1.DTOs.VentaDt;
 using ApiTiendaV1.Modelos;
 using ApiTiendaV1.Repositorios.ClienteRop;
 using ApiTiendaV1.Repositorios.VentaRop;
+using ApiTiendaV1.Servicios.ClienteSrv;
 
 namespace ApiTiendaV1.Servicios.VentaSrv
 {
@@ -10,11 +11,13 @@ namespace ApiTiendaV1.Servicios.VentaSrv
     {
         private readonly IVentaRepo _ventaRepo;
         private readonly IClienteRepo _clienteRepo;
+        private readonly IClienteService _clienteService;
 
-        public VentaService(IVentaRepo ventaRepo, IClienteRepo clienteRepo)
+        public VentaService(IVentaRepo ventaRepo, IClienteRepo clienteRepo, IClienteService clienteServ)
         {
             _ventaRepo = ventaRepo;
             _clienteRepo = clienteRepo;
+            _clienteService = clienteServ;
         }
 
         public async Task<int> Crear_VentAsync(VentaCrearDto dto, CancellationToken ct = default)
@@ -116,9 +119,15 @@ namespace ApiTiendaV1.Servicios.VentaSrv
 
         public async Task<IEnumerable<VentaDto>> Obtener_Vent_por_FechaAsync(BuscarVenta buscarVenta, CancellationToken ct = default)
         {
-            if (buscarVenta.fecha_venta == null){
+            if (buscarVenta.fecha_venta == null)
                 throw new ArgumentException("fecha_venta es obligatoria");
+            if (buscarVenta.id_cliente == 0)
+            {
+                return await _ventaRepo.Obtener_Ven_por_FechaAsync(buscarVenta, ct);
             }
+
+            var cliente = await _clienteService.Obtener_CliPorIdAsync(buscarVenta.id_cliente, ct);
+
             return await _ventaRepo.Obtener_Ven_por_FechaAsync(buscarVenta, ct);
 
         }

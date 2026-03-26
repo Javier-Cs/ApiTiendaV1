@@ -41,11 +41,22 @@ namespace ApiTiendaV1.Controllers
             int idCliente,
             CancellationToken ct)
         {
-            var cliente = await _clienteService.Obtener_CliPorIdAsync(idCliente, ct);
-            if (cliente == null)
-                return NotFound();
-
-            return Ok(cliente);
+            try
+            {
+                var cliente = await _clienteService.Obtener_CliPorIdAsync(idCliente, ct);
+                return Ok(cliente);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+            catch (KeyNotFoundException ex) {
+                return NotFound(new { mensaje = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { mensaje = ex.Message });
+            }
         }
 
         // PUT: api/clientes/{idCliente}
