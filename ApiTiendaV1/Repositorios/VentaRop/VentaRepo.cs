@@ -2,6 +2,7 @@
 using ApiTiendaV1.DTOs;
 using ApiTiendaV1.DTOs.VentaDt;
 using Dapper;
+using System.Text;
 
 namespace ApiTiendaV1.Repositorios.VentaRop
 {
@@ -244,6 +245,56 @@ namespace ApiTiendaV1.Repositorios.VentaRop
             );
 
             return rows > 0;
+        }
+
+        public async Task<IEnumerable<VentaDto>> Obtener_Ven_por_FechaAsync(BuscarVenta buscarVenta, CancellationToken ct = default)
+            {
+            var fechaBase = buscarVenta?.fecha_venta.Date;
+            DateTime? fechaInicio = fechaBase;
+            DateTime? fechaFin = fechaBase?.AddDays(1);
+
+            var sql = new StringBuilder(@"
+            SELECT
+                id_venta,
+                id_cliente,
+                nombre_vendedor,
+                tipo_venta,
+                estado_venta,
+                monto_total_Venta,
+                fecha_venta    
+            FROM ventas
+            WHERE 1=1 ");
+
+            int? id_Cliente = buscarVenta?.id_cliente;
+            string? tipo_venta = buscarVenta?.tipo_venta;
+            var parametros = new DynamicParameters();
+
+            if (fechaInicio != null && fechaFin != null) {
+                sql.Append(" AND fecha_venta >= @fechaInicio AND fecha_venta < @fechaFin");
+                parametros.Add("fechaInicio", fechaInicio, System.Data.DbType.DateTime2);
+                parametros.Add("fechaFin", fechaFin, System.Data.DbType.DateTime2);
+               
+            } 
+            if (id_Cliente != null && id_Cliente != 0) {
+                sql.Append(" AND id_cliente = @id_Cliente");
+                parametros.Add("id_Cliente", id_Cliente);
+                
+            }
+            if (!string.IsNullOrWhiteSpace(tipo_venta))
+            {
+                sql.Append(" AND tipo_venta = @tipo_venta");
+                parametros.Add("tipo_venta", tipo_venta);
+            }
+
+            sql.Append(" ORDER BY fecha_venta DESC;");
+
+
+            using var connection = _sqlconnection.CreateConnection();
+            var ventasPorFecha = await connection.QueryAsync<VentaDto>(
+                    new CommandDefinition(sql.ToString() , parametros, cancellationToken: ct)
+                );
+            return ventasPorFecha.AsList();
+
         }
     }
 }

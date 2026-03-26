@@ -113,5 +113,15 @@ namespace ApiTiendaV1.Servicios.VentaSrv
             return await _ventaRepo.ActualizarVentaAsync(idVenta, dto, ct);
             
         }
+
+        public async Task<IEnumerable<VentaDto>> Obtener_Vent_por_FechaAsync(BuscarVenta buscarVenta, CancellationToken ct = default)
+        {
+            if (buscarVenta.fecha_venta == null){
+                throw new ArgumentException("fecha_venta es obligatoria");
+            }
+            return await _ventaRepo.Obtener_Ven_por_FechaAsync(buscarVenta, ct);
+
+        }
     }
+
 }

@@ -91,6 +91,14 @@ namespace ApiTiendaV1.Controllers
         }
 
 
+        [HttpPost("/FechaVenta")]
+        public async Task<IActionResult> BuscarPorFecha([FromBody] BuscarVenta buscarVenta, CancellationToken ct) {
+            var resultado = await _ventaService.Obtener_Vent_por_FechaAsync(buscarVenta, ct);
+            return Ok(resultado);
+        }
+
+
+
 
         [HttpOptions]
         public IActionResult Options()
