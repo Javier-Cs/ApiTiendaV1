@@ -4,6 +4,7 @@
     {
         public int id_venta { get; set; }
         public int id_cliente { get; set; }
+        public string nombre { get; set; }
         public string nombre_vendedor { get; set; }
         public string tipo_venta { get; set; }
         public string estado_venta { get; set; }

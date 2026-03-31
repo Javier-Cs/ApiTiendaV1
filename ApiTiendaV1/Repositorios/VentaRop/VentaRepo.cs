@@ -88,16 +88,20 @@ namespace ApiTiendaV1.Repositorios.VentaRop
         {
             const int meses = 2;
             const string sql = @"SELECT 
-                id_venta,
-                id_cliente,
-                nombre_vendedor,
-                tipo_venta,
-                estado_venta,
-                monto_total_Venta,
-                fecha_venta    
-                FROM ventas
-                WHERE fecha_venta >= DATEADD(MONTH, -@meses, GETDATE())
-                ORDER BY fecha_venta DESC";
+	            v.id_venta,
+	            v.id_cliente,
+	            V.nombre_vendedor,
+	            c.nombre,
+	            v.tipo_venta,
+	            V.estado_venta,
+	            v.monto_total_Venta,
+	            v.fecha_venta
+	
+            FROM ventas v
+            INNER JOIN clientes c
+	            ON v.id_cliente = c.id_cliente 
+            WHERE fecha_venta >= DATEADD(MONTH, -@meses, GETDATE())
+            ORDER BY fecha_venta DESC;";
             using var connections = _sqlconnection.CreateConnection();
             var ventas = await connections.QueryAsync<VentaDto>(
                     new CommandDefinition(sql,new { meses }, cancellationToken: ct)
