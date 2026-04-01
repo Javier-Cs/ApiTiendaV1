@@ -139,17 +139,21 @@ namespace ApiTiendaV1.Repositorios.VentaRop
         // este metodo es solo para mostrar las ventas que tienen deuda por credito
         public async Task<IEnumerable<VentaDto>> ObtenerTodasVenConDeudaAsync(CancellationToken ct = default)
         {
-            const string sql = @"SELECT
-            id_venta,
-            id_cliente,
-            nombre_vendedor,
-            tipo_venta,
-            estado_venta,
-            monto_total_Venta,
-            fecha_venta
-        FROM ventas
-        WHERE estado_venta = @estado AND tipo_venta = @tipo
-        ORDER BY fecha_venta DESC;";
+            const string sql = @"SELECT 
+	            v.id_venta,
+	            v.id_cliente,
+	            V.nombre_vendedor,
+	            c.nombre,
+	            v.tipo_venta,
+	            V.estado_venta,
+	            v.monto_total_Venta,
+	            v.fecha_venta
+	
+            FROM ventas v
+            INNER JOIN clientes c
+                ON v.id_cliente = c.id_cliente
+            WHERE estado_venta = @estado AND tipo_venta = @tipo
+            ORDER BY fecha_venta DESC;";
             using var connection = _sqlconnection.CreateConnection();
             var todasLasventasconDeuda = await connection.QueryAsync<VentaDto>(
                     new CommandDefinition(sql,new {estado = EstadoVenta.Deuda, tipo= TipoVenta.Credito }, cancellationToken:ct)
@@ -161,17 +165,20 @@ namespace ApiTiendaV1.Repositorios.VentaRop
 
         public async Task<IEnumerable<VentaDto>> ObtenerVenDeudaPorClienteAsync(int idCliente, string estadoVenta, string tipoVenta, CancellationToken ct = default)
         {
-            const string sql = @"SELECT
-            id_venta,
-            id_cliente,
-            nombre_vendedor,
-            tipo_venta,
-            estado_venta,
-            monto_total_Venta,
-            fecha_venta
-        FROM ventas
-        WHERE id_cliente = @idCliente AND estado_venta = @estadoVenta  AND tipo_venta = @tipoVenta
-        ORDER BY fecha_venta DESC;";
+            const string sql = @"SELECT 
+	            v.id_venta,
+	            v.id_cliente,
+	            V.nombre_vendedor,
+	            c.nombre,
+	            v.tipo_venta,
+	            V.estado_venta,
+	            v.monto_total_Venta,
+	            v.fecha_venta
+            FROM ventas v
+            INNER JOIN clientes c
+                ON v.id_cliente = c.id_cliente     
+            WHERE v.id_cliente = @idCliente AND estado_venta = @estadoVenta  AND tipo_venta = @tipoVenta
+            ORDER BY fecha_venta DESC;";
 
             using var connection = _sqlconnection.CreateConnection();
 
