@@ -1,4 +1,5 @@
 ﻿using ApiTiendaV1.DTOs;
+using ApiTiendaV1.DTOs.ClienteDt;
 using ApiTiendaV1.DTOs.VentaDt;
 
 namespace ApiTiendaV1.Servicios.VentaSrv
@@ -17,5 +18,8 @@ namespace ApiTiendaV1.Servicios.VentaSrv
         Task<IEnumerable<VentaDto>> Obtener_Vent_por_FechaAsync(BuscarVenta buscarVenta, CancellationToken ct = default);
        
         Task<bool> ActualizarVentaAsync(int idVenta, VentaUpDto dto , CancellationToken ct = default);
+
+
+        Task<IEnumerable<ClienteVentDeudor>> Obtener_ClientesConDeudasAsync(CancellationToken ct = default);
     }
 }

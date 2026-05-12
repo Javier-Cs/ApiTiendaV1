@@ -1,4 +1,5 @@
 ﻿using ApiTiendaV1.DTOs;
+using ApiTiendaV1.DTOs.ClienteDt;
 using ApiTiendaV1.DTOs.VentaDt;
 using ApiTiendaV1.Modelos;
 using ApiTiendaV1.Repositorios.ClienteRop;
@@ -38,7 +39,8 @@ namespace ApiTiendaV1.Servicios.VentaSrv
                 dto.monto_vuelto = dto.efectivo_recibido - dto.monto_total_Venta;
                 //dto.estado_venta = EstadoVenta.Pagado;
             }
-            else if (dto.tipo_venta == TipoVenta.Contado && dto.efectivo_recibido == 0) {
+            else if (dto.tipo_venta == TipoVenta.Contado && dto.efectivo_recibido == 0)
+            {
                 dto.monto_vuelto = 0;
             }
             else if (dto.tipo_venta == TipoVenta.Credito)
@@ -58,10 +60,11 @@ namespace ApiTiendaV1.Servicios.VentaSrv
 
         public async Task<bool> Eliminar_VentAsync(int idVenta, int idCliente, CancellationToken ct = default)
         {
-            var venta = await _ventaRepo.ObtenerVenPorIdVenAsync( idVenta, ct);
+            var venta = await _ventaRepo.ObtenerVenPorIdVenAsync(idVenta, ct);
             if (venta == null)
                 throw new KeyNotFoundException("Venta no encontrado");
-            if (venta.id_cliente != idCliente) {
+            if (venta.id_cliente != idCliente)
+            {
                 throw new InvalidOperationException("La venta no pertenece al cliente");
             }
 
@@ -89,11 +92,12 @@ namespace ApiTiendaV1.Servicios.VentaSrv
         public async Task<bool> ActualizarVentaAsync(int idVenta, VentaUpDto dto, CancellationToken ct = default)
         {
             var venta = await _ventaRepo.ObtenerVenPorIdVenAsync(idVenta, ct);
-            if (venta == null) {
+            if (venta == null)
+            {
                 throw new KeyNotFoundException("venta no encontrada");
             }
             if (dto.descripcion_venta == null && dto.tipo_venta == null && dto.efectivo_recibido == null
-                && dto.monto_total_Venta == null ) 
+                && dto.monto_total_Venta == null)
             {
                 throw new ArgumentException("No hay datos para actualizar..");
             }
@@ -107,14 +111,14 @@ namespace ApiTiendaV1.Servicios.VentaSrv
             //if (dto.monto_vuelto < 0)
             //    throw new ArgumentException("El vuelto no puede ser negativo.");
 
-            if (dto.efectivo_recibido.HasValue && dto.monto_total_Venta.HasValue && 
+            if (dto.efectivo_recibido.HasValue && dto.monto_total_Venta.HasValue &&
                 dto.efectivo_recibido < dto.monto_total_Venta)
                 throw new InvalidOperationException("El efectivo recibido es insuficiente.");
 
             //dto.monto_vuelto = dto.efectivo_recibido - dto.monto_total_Venta;
 
             return await _ventaRepo.ActualizarVentaAsync(idVenta, dto, ct);
-            
+
         }
 
         public async Task<IEnumerable<VentaDto>> Obtener_Vent_por_FechaAsync(BuscarVenta buscarVenta, CancellationToken ct = default)
@@ -126,17 +130,20 @@ namespace ApiTiendaV1.Servicios.VentaSrv
                 return await _ventaRepo.Obtener_Ven_por_FechaAsync(buscarVenta, ct);
             }
 
-            if (buscarVenta.tipo_venta != "CONTADO" && buscarVenta.tipo_venta != "CREDITO") {
+            if (buscarVenta.tipo_venta != "CONTADO" && buscarVenta.tipo_venta != "CREDITO")
+            {
                 throw new ArgumentException(" El tipo ingresadob es invalido");
             }
-            
-            
+
+
 
             var cliente = await _clienteService.Obtener_CliPorIdAsync(buscarVenta.id_cliente, ct);
 
             return await _ventaRepo.Obtener_Ven_por_FechaAsync(buscarVenta, ct);
 
         }
-    }
 
+        public Task<IEnumerable<ClienteVentDeudor>> Obtener_ClientesConDeudasAsync(CancellationToken ct = default)
+            => _ventaRepo.ObtenerClientesConDeudasAsync(ct);
+    }
 }

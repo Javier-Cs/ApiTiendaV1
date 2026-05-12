@@ -112,11 +112,24 @@ namespace ApiTiendaV1.Controllers
 
 
 
+        [HttpGet("TotalVentasClient")]
+        public async Task<IActionResult> ObtenerTotalVentasPorCliente(CancellationToken ct)
+        {
+            var resultado = await _ventaService.Obtener_ClientesConDeudasAsync();
+            return Ok(resultado);
+        }
+
+
+
 
         [HttpOptions]
         public IActionResult Options()
         {
             return Ok();
         }
+
+
+
+
     }
 }

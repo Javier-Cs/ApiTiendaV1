@@ -1,5 +1,6 @@
 ﻿using ApiTiendaV1.Data;
 using ApiTiendaV1.DTOs;
+using ApiTiendaV1.DTOs.ClienteDt;
 using ApiTiendaV1.DTOs.VentaDt;
 using Dapper;
 using System.Text;
@@ -306,6 +307,41 @@ namespace ApiTiendaV1.Repositorios.VentaRop
                 );
             return ventasPorFecha.AsList();
 
+        }
+
+        public async Task<IEnumerable<ClienteVentDeudor>> ObtenerClientesConDeudasAsync(CancellationToken ct = default)
+        {
+            const string sql = @"
+            SELECT 
+                c.id_cliente,
+                c.nombre,
+                MAX(v.nombre_vendedor) AS nombre_vendedor,
+
+                COUNT(v.id_venta) AS cantidadDeDeudas,
+
+                SUM(v.monto_total_Venta) AS monto_total_Venta,
+
+                MAX(v.fecha_venta) AS fecha_ultima_venta
+
+            FROM ventas v
+            INNER JOIN clientes c 
+                ON c.id_cliente = v.id_cliente
+
+            WHERE v.estado_venta = 'DEUDA'
+
+            GROUP BY 
+                c.id_cliente,
+                c.nombre
+
+            ORDER BY monto_total_Venta DESC
+            ";
+
+            using var connection = _sqlconnection.CreateConnection();
+            var ventas = await connection.QueryAsync<ClienteVentDeudor>(
+                    new CommandDefinition(sql, cancellationToken: ct)
+                );
+
+            return ventas.AsList();
         }
     }
 }
