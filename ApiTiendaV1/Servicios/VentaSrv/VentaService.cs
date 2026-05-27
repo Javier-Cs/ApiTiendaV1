@@ -145,5 +145,7 @@ namespace ApiTiendaV1.Servicios.VentaSrv
 
         public Task<IEnumerable<ClienteVentDeudor>> Obtener_ClientesConDeudasAsync(CancellationToken ct = default)
             => _ventaRepo.ObtenerClientesConDeudasAsync(ct);
+
+        
     }
 }

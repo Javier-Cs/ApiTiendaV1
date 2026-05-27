@@ -4,6 +4,7 @@ using ApiTiendaV1.Repositorios.PagoRop;
 using ApiTiendaV1.Repositorios.VentaRop;
 using ApiTiendaV1.Servicios.ClienteSrv;
 using ApiTiendaV1.Servicios.PagoSrv;
+using ApiTiendaV1.Servicios.PeopleSrv;
 using ApiTiendaV1.Servicios.VentaSrv;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,7 +33,8 @@ builder.Services.AddCors(options => {
             policy.WithOrigins(
                 "http://localhost:4321",
                 "https://legumfrutsa.com",
-                "https://www.legumfrutsa.com")
+                "https://www.legumfrutsa.com",
+                "https://datospr.cedesystem.com")
             .AllowAnyHeader()
             .AllowAnyMethod();
         });

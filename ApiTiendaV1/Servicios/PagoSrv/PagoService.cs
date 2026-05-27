@@ -1,4 +1,5 @@
 ﻿using ApiTiendaV1.DTOs;
+using ApiTiendaV1.DTOs.VentaDt;
 using ApiTiendaV1.Repositorios.PagoRop;
 
 namespace ApiTiendaV1.Servicios.PagoSrv
@@ -21,6 +22,14 @@ namespace ApiTiendaV1.Servicios.PagoSrv
             return _pagoRepo.CrearPagoAsync(dto, ct);
 
 
+        }
+
+        public Task<List<ValoresVentasDto>> verValoresAPagar(ValoresConsultVentasDto valoresDeVentas, CancellationToken ct = default)
+        {
+            if (valoresDeVentas == null || valoresDeVentas.id_venta == 0) {
+                throw new ArgumentNullException("Elemento vacio o con formato null");
+            }
+            return _pagoRepo.ObtenerValoresVentasAsync(valoresDeVentas, ct);
         }
     }
 }

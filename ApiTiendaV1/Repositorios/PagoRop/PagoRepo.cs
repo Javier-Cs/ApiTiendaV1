@@ -15,6 +15,42 @@ namespace ApiTiendaV1.Repositorios.PagoRop
         {
             _sqlconnection = sqlConnection;
         }
+        
+        
+        public async Task<List<ValoresVentasDto>> ObtenerValoresVentasAsync(
+            ValoresConsultVentasDto valores, 
+            CancellationToken ct = default) 
+        {
+            
+            const string sql = @"
+                select 
+                v.id_venta,
+                v.descripcion_venta,
+                v.monto_total_Venta
+	
+                from ventas v
+                INNER JOIN clientes c
+	                ON c.id_cliente = v.id_cliente
+                where v.id_venta  = @id_venta
+	                AND v.estado_venta = @estado_venta;
+            ";
+
+            using var connection = _sqlconnection.CreateConnection();
+
+            var resultados = await connection.QueryAsync<ValoresVentasDto>(
+                new CommandDefinition(
+                    sql, 
+                    new
+                    {
+                        valores.id_venta,
+                        valores.estado_venta
+                    }, cancellationToken: ct)
+            );
+
+            return resultados.ToList();
+        }
+
+
         public async Task CrearPagoAsync(ReporteClientePagoDto dto, CancellationToken ct = default)
         {
 
@@ -31,8 +67,6 @@ namespace ApiTiendaV1.Repositorios.PagoRop
 
             try
             {
-
-
                 // primero guardamos los registros del el pago
                 const string sqlPago = @"insert into registro_pago_Ventas (
                         id_clientef,
@@ -48,6 +82,17 @@ namespace ApiTiendaV1.Repositorios.PagoRop
                         @numeroVentas)
                     select cast(scope_identity() as int);";
 
+                /*
+                 * nombre_cliente,
+                        nombre_vendedor,
+                        descripcion_de_pago,
+                        
+                 * ,
+                        @nombre_cliente,
+                        @nombre_vendedor,
+                        @descripcion_de_pago)
+                 */
+
                 var idPago = await connection.ExecuteScalarAsync<int>(
                     sqlPago,
                     new
@@ -57,6 +102,9 @@ namespace ApiTiendaV1.Repositorios.PagoRop
                         efectivo_recibido = dto.efectivo_recibido,
                         monto_total_Venta = dto.monto_total_Venta,
                         vuelto
+                        //nombre_cliente = dto.nombre_cliente,
+                        //nombre_vendedor = dto.nombre_vendedor,
+                        //descripcion_de_pago = dto.descripcion_de_pago   
                     },
                     transaccion
                     );
@@ -83,6 +131,7 @@ namespace ApiTiendaV1.Repositorios.PagoRop
                 update ventas 
                 set estado_venta = 'PAGADO'
                 WHERE id_venta in @ids
+                and is_deleted = 0
                 and estado_venta = 'DEUDA'";
 
                 await connection.ExecuteAsync(
@@ -107,5 +156,13 @@ namespace ApiTiendaV1.Repositorios.PagoRop
 
             }
 
-        }}
+        }
+
+
+
+        
+
+
+    }
+
 }

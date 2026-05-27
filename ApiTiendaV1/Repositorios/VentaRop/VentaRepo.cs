@@ -71,7 +71,7 @@ namespace ApiTiendaV1.Repositorios.VentaRop
         {
             const string sql = @"
                 UPDATE ventas
-                SET estado_venta = 'PAGADO'
+                SET is_deleted = 1
                 WHERE id_venta = @idVenta
                   AND id_cliente = @idCliente;
             ";
@@ -101,7 +101,7 @@ namespace ApiTiendaV1.Repositorios.VentaRop
             FROM ventas v
             INNER JOIN clientes c
 	            ON v.id_cliente = c.id_cliente 
-            WHERE fecha_venta >= DATEADD(MONTH, -@meses, GETDATE())
+            WHERE v.is_deleted = 0 and fecha_venta >= DATEADD(MONTH, -@meses, GETDATE())
             ORDER BY fecha_venta DESC;";
             using var connections = _sqlconnection.CreateConnection();
             var ventas = await connections.QueryAsync<VentaDto>(
@@ -125,7 +125,7 @@ namespace ApiTiendaV1.Repositorios.VentaRop
             monto_vuelto,
             fecha_venta
         FROM ventas
-        WHERE id_venta = @idVenta;";
+        WHERE id_venta = @idVenta AND is_deleted = 0;";
 
             using var connection = _sqlconnection.CreateConnection();
 
@@ -153,8 +153,8 @@ namespace ApiTiendaV1.Repositorios.VentaRop
             FROM ventas v
             INNER JOIN clientes c
                 ON v.id_cliente = c.id_cliente
-            WHERE estado_venta = @estado AND tipo_venta = @tipo
-            ORDER BY fecha_venta DESC;";
+            WHERE v.estado_venta = @estado AND v.tipo_venta = @tipo AND v.is_deleted = 0
+            ORDER BY v.fecha_venta DESC;";
             using var connection = _sqlconnection.CreateConnection();
             var todasLasventasconDeuda = await connection.QueryAsync<VentaDto>(
                     new CommandDefinition(sql,new {estado = EstadoVenta.Deuda, tipo= TipoVenta.Credito }, cancellationToken:ct)
@@ -178,7 +178,7 @@ namespace ApiTiendaV1.Repositorios.VentaRop
             FROM ventas v
             INNER JOIN clientes c
                 ON v.id_cliente = c.id_cliente     
-            WHERE v.id_cliente = @idCliente AND estado_venta = @estadoVenta  AND tipo_venta = @tipoVenta
+            WHERE v.id_cliente = @idCliente AND v.estado_venta = @estadoVenta  AND v.tipo_venta = @tipoVenta AND v.is_deleted = 0
             ORDER BY fecha_venta DESC;";
 
             using var connection = _sqlconnection.CreateConnection();
@@ -200,7 +200,7 @@ namespace ApiTiendaV1.Repositorios.VentaRop
             monto_total_Venta,
             fecha_venta
         FROM ventas
-        WHERE id_cliente = @idCliente 
+        WHERE id_cliente = @idCliente and is_deleted = 0
         ORDER BY fecha_venta DESC;";
 
             using var connection = _sqlconnection.CreateConnection();
@@ -275,7 +275,7 @@ namespace ApiTiendaV1.Repositorios.VentaRop
                 monto_total_Venta,
                 fecha_venta    
             FROM ventas
-            WHERE 1=1 ");
+            WHERE 1=1 AND v.is_deleted = 0 ");
 
             int? id_Cliente = buscarVenta?.id_cliente;
             string? tipo_venta = buscarVenta?.tipo_venta;
@@ -327,7 +327,7 @@ namespace ApiTiendaV1.Repositorios.VentaRop
             INNER JOIN clientes c 
                 ON c.id_cliente = v.id_cliente
 
-            WHERE v.estado_venta = 'DEUDA'
+            WHERE v.estado_venta = 'DEUDA' AND v.tipo_venta = 'CREDITO' AND v.is_deleted = 0
 
             GROUP BY 
                 c.id_cliente,

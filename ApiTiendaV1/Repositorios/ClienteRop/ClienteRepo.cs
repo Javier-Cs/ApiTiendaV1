@@ -131,7 +131,12 @@ namespace ApiTiendaV1.Repositorios.ClienteRop
                     WHERE estado = @estadoCliente AND tipo = @tipocliente;";
             using var connection = _sqlconnection.CreateConnection();
             var todoLosClientesEstado =  await connection.QueryAsync<ClienteDto>(
-                new CommandDefinition(sql, new { estadoCliente, tipocliente}, cancellationToken: ct)
+                new CommandDefinition(
+                    sql, 
+                    new { 
+                        estadoCliente, 
+                        tipocliente
+                    }, cancellationToken: ct)
                 );
             return todoLosClientesEstado.AsList();
 
