@@ -6,8 +6,11 @@ using ApiTiendaV1.Servicios.ClienteSrv;
 using ApiTiendaV1.Servicios.PagoSrv;
 using ApiTiendaV1.Servicios.PeopleSrv;
 using ApiTiendaV1.Servicios.VentaSrv;
+using ApiTiendaV1.Validation;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Options;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +35,13 @@ builder.Services.AddScoped<IPagoRepo, PagoRepo>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IVentaService, VentaService>();
 builder.Services.AddScoped<IPagoService, PagoService>();
+
+builder.Services.Configure<ForwardedHeadersOptions>(
+    options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    }
+);
 
 
 
@@ -61,15 +71,15 @@ builder.Services.AddCors(options => {
             policy.WithOrigins(
                 "http://localhost:4321",
                 "https://legumfrutsa.com",
-                "https://www.legumfrutsa.com")
+                "https://legumfrutsa.com/dash")
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
         });
 });
 
 
 var app = builder.Build();
-
 
 // Configuracion swagger
 app.UseSwagger();
@@ -80,17 +90,8 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger";
 });
 
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//}
-
-//app.UseHttpsRedirection();
-//app.UseDeveloperExceptionPage();
-
 
 // MODO DESARROLLO
-
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
