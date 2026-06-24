@@ -28,7 +28,7 @@ namespace ApiTiendaV1.Repositorios.ClienteRop
             if (dto.estado.HasValue) updates.Add("estado = @estado");
 
             sql += " " + string.Join(", ", updates);
-            sql += " WHERE id_cliente = @idCliente";
+            sql += " WHERE id_cliente = @idCliente AND is_deleted = 0";
 
             using var connection = _sqlconnection.CreateConnection();
 
@@ -65,7 +65,7 @@ namespace ApiTiendaV1.Repositorios.ClienteRop
         {
             const string sql = @"
                 UPDATE clientes
-                SET estado = 0
+                SET estado = 0, is_deleted = 1
                 WHERE id_cliente = @idCliente;
             ";
 
@@ -87,7 +87,7 @@ namespace ApiTiendaV1.Repositorios.ClienteRop
                 estado,
                 fecha_creacion
             FROM clientes
-            WHERE id_cliente = @idCliente;";
+            WHERE id_cliente = @idCliente AND is_deleted = 0;";
             using var connection = _sqlconnection.CreateConnection();
             var cliente = await connection.QueryFirstOrDefaultAsync<ClienteCompleDto>(
                     new CommandDefinition(sql, new {idCliente}, cancellationToken: ct)
@@ -106,6 +106,7 @@ namespace ApiTiendaV1.Repositorios.ClienteRop
                 estado,
                 fecha_creacion
             FROM clientes
+            WHERE is_deleted = 0 AND estado = 1
             ORDER BY nombre;
                 ";
 
@@ -128,7 +129,7 @@ namespace ApiTiendaV1.Repositorios.ClienteRop
                         estado,
                         fecha_creacion
                     FROM clientes
-                    WHERE estado = @estadoCliente AND tipo = @tipocliente;";
+                    WHERE estado = @estadoCliente AND tipo = @tipocliente AND is_deleted = 0;";
             using var connection = _sqlconnection.CreateConnection();
             var todoLosClientesEstado =  await connection.QueryAsync<ClienteDto>(
                 new CommandDefinition(
@@ -146,7 +147,8 @@ namespace ApiTiendaV1.Repositorios.ClienteRop
 
             const string sqlb = @"
                         select top 10 id_cliente, nombre 
-                        from clientes where nombre 
+                        from clientes 
+                        where is_deleted = 0 AND nombre 
                         like '%'+@nombre+'%' 
                         order by nombre;";
 

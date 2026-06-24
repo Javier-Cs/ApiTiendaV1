@@ -1,4 +1,5 @@
 ﻿using ApiTiendaV1.DTOs;
+using ApiTiendaV1.DTOs.DeudasPorPagarDto;
 using ApiTiendaV1.DTOs.VentaDt;
 using ApiTiendaV1.Servicios.PagoSrv;
 using Microsoft.AspNetCore.Mvc;
@@ -35,29 +36,20 @@ namespace ApiTiendaV1.Controllers
         }
 
 
-        [HttpGet("valores-a-pagar")]
-        public async Task<ActionResult<List<ValoresVentasDto>>> VerValoresAPagar(
-            [FromQuery] ValoresConsultVentasDto valoresDeVentas,
-            CancellationToken ct = default)
-        {
+
+
+        [HttpPost("Pagar-ventas-deuda")]
+        public async Task<IActionResult> RegistraVentasConDeudaAPagar([FromBody] VentasAPagarConDeudaDto deudaVenta, CancellationToken ct) {
             try
             {
-                var resultados = await _pagoService.verValoresAPagar(valoresDeVentas, ct);
-                return resultados;
+                await _pagoService.PagarDeudasVenta(deudaVenta, ct);
+                return Ok(new { message = "pago registrado correctamente." });
             }
-            catch (ArgumentNullException ex)
-            {
-                return BadRequest(
-                    new
-                    {
-                        mensaje = ex.Message
-                    }
-                );
+            catch(Exception ex) {
+                return BadRequest(new { message = $"Error al registrar el pago: {ex.Message}" });
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { mensaje = $"Error al obtener los valores a pagar: {ex.Message}" });
-            }
+
         }
+
     }
 }

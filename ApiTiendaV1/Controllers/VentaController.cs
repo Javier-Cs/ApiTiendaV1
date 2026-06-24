@@ -91,7 +91,7 @@ namespace ApiTiendaV1.Controllers
         }
 
 
-        [HttpPost("/FechaVenta")]
+        [HttpPost("FechaVenta")]
         public async Task<IActionResult> BuscarPorFecha([FromBody] BuscarVenta buscarVenta, CancellationToken ct) {
 
             try

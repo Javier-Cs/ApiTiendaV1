@@ -5,6 +5,7 @@
         public int? id_venta { get; set; }
         public decimal? monto_total_Venta { get; set; }
         public string? descripcion_venta { get; set; } = null;
+        public DateTime? date_venta { get; set; }
     }
 
 

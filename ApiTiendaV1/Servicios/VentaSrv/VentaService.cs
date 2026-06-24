@@ -125,23 +125,20 @@ namespace ApiTiendaV1.Servicios.VentaSrv
         {
             if (buscarVenta.fecha_venta == null)
                 throw new ArgumentException("fecha_venta es obligatoria");
+
             if (buscarVenta.id_cliente == 0 && buscarVenta.tipo_venta == "")
             {
-                return await _ventaRepo.Obtener_Ven_por_FechaAsync(buscarVenta, ct);
+                return await _ventaRepo.Obtener_Ven_All_por_FechaAsync(buscarVenta, ct);
             }
-
+            
             if (buscarVenta.tipo_venta != "CONTADO" && buscarVenta.tipo_venta != "CREDITO")
             {
                 throw new ArgumentException(" El tipo ingresadob es invalido");
             }
-
-
-
-            var cliente = await _clienteService.Obtener_CliPorIdAsync(buscarVenta.id_cliente, ct);
-
             return await _ventaRepo.Obtener_Ven_por_FechaAsync(buscarVenta, ct);
-
         }
+
+
 
         public Task<IEnumerable<ClienteVentDeudor>> Obtener_ClientesConDeudasAsync(CancellationToken ct = default)
             => _ventaRepo.ObtenerClientesConDeudasAsync(ct);

@@ -1,6 +1,8 @@
 ﻿using ApiTiendaV1.DTOs;
+using ApiTiendaV1.DTOs.DeudasPorPagarDto;
 using ApiTiendaV1.DTOs.VentaDt;
 using ApiTiendaV1.Repositorios.PagoRop;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ApiTiendaV1.Servicios.PagoSrv
 {
@@ -24,12 +26,32 @@ namespace ApiTiendaV1.Servicios.PagoSrv
 
         }
 
-        public Task<List<ValoresVentasDto>> verValoresAPagar(ValoresConsultVentasDto valoresDeVentas, CancellationToken ct = default)
+        public Task PagarDeudasVenta(VentasAPagarConDeudaDto dto, CancellationToken ct = default)
         {
-            if (valoresDeVentas == null || valoresDeVentas.id_venta == 0) {
-                throw new ArgumentNullException("Elemento vacio o con formato null");
-            }
-            return _pagoRepo.ObtenerValoresVentasAsync(valoresDeVentas, ct);
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
+            if (dto.cliente == null)
+                throw new Exception("cliente null");
+
+            if (dto.lista_ventas == null || !dto.lista_ventas.Any())
+                throw new Exception("lista ventas vacia");
+
+            if (string.IsNullOrWhiteSpace(dto.cliente.telefono))
+                throw new Exception("telefono requerido");
+
+            if (string.IsNullOrWhiteSpace(dto.cliente.email))
+                throw new Exception("email requerido");
+
+            /*if (dto.efectivo_recibido < dto.monto_total_Venta)
+                throw new Exception(
+                    "efectivo insuficiente");*/
+
+            //dto.vuelto = dto.efectivo_recibido - dto.monto_total_Venta;
+            return _pagoRepo.PagarDeudas(dto, ct);
+
         }
+
+      
     }
 }

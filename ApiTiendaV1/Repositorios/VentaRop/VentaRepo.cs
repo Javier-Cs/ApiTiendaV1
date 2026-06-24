@@ -85,6 +85,8 @@ namespace ApiTiendaV1.Repositorios.VentaRop
         }
 
 
+
+
         public async Task<IEnumerable<VentaDto>> ObtenerTodasLasVenAsync(CancellationToken ct = default)
         {
             const int meses = 2;
@@ -109,6 +111,9 @@ namespace ApiTiendaV1.Repositorios.VentaRop
                 );
             return ventas.AsList();
         }
+
+
+
 
         // obtener toda la informacion de la venta de una venta 
         public async Task<VentaCompletaDto?> ObtenerVenPorIdVenAsync(int idVenta, CancellationToken ct = default)
@@ -135,7 +140,7 @@ namespace ApiTiendaV1.Repositorios.VentaRop
         }
 
 
-        //-----
+        
 
         // este metodo es solo para mostrar las ventas que tienen deuda por credito
         public async Task<IEnumerable<VentaDto>> ObtenerTodasVenConDeudaAsync(CancellationToken ct = default)
@@ -164,6 +169,7 @@ namespace ApiTiendaV1.Repositorios.VentaRop
 
 
 
+
         public async Task<IEnumerable<VentaDto>> ObtenerVenDeudaPorClienteAsync(int idCliente, string estadoVenta, string tipoVenta, CancellationToken ct = default)
         {
             const string sql = @"SELECT 
@@ -189,19 +195,21 @@ namespace ApiTiendaV1.Repositorios.VentaRop
             return deudasPorCliente.AsList();
         }
 
+
+
         public async Task<IEnumerable<VentaDto>> ObtenerVentasPorClienteAsync(int idCliente, CancellationToken ct = default)
         {
             const string sql = @"SELECT
-            id_venta,
-            id_cliente,
-            nombre_vendedor,
-            tipo_venta,
-            estado_venta,
-            monto_total_Venta,
-            fecha_venta
-        FROM ventas
-        WHERE id_cliente = @idCliente and is_deleted = 0
-        ORDER BY fecha_venta DESC;";
+                id_venta,
+                id_cliente,
+                nombre_vendedor,
+                tipo_venta,
+                estado_venta,
+                monto_total_Venta,
+                fecha_venta
+            FROM ventas
+            WHERE id_cliente = @idCliente and is_deleted = 0
+            ORDER BY fecha_venta DESC;";
 
             using var connection = _sqlconnection.CreateConnection();
 
@@ -210,6 +218,9 @@ namespace ApiTiendaV1.Repositorios.VentaRop
 
             return ventaPorCliente.AsList();
         }
+
+
+
 
         public async Task<bool> ActualizarVentaAsync(int idVenta, VentaUpDto dto, CancellationToken ct = default)
         {
@@ -259,6 +270,9 @@ namespace ApiTiendaV1.Repositorios.VentaRop
             return rows > 0;
         }
 
+
+
+
         public async Task<IEnumerable<VentaDto>> Obtener_Ven_por_FechaAsync(BuscarVenta buscarVenta, CancellationToken ct = default)
             {
             var fechaBase = buscarVenta?.fecha_venta.Date;
@@ -275,7 +289,7 @@ namespace ApiTiendaV1.Repositorios.VentaRop
                 monto_total_Venta,
                 fecha_venta    
             FROM ventas
-            WHERE 1=1 AND v.is_deleted = 0 ");
+            WHERE 1=1 AND is_deleted = 0 ");
 
             int? id_Cliente = buscarVenta?.id_cliente;
             string? tipo_venta = buscarVenta?.tipo_venta;
@@ -309,6 +323,63 @@ namespace ApiTiendaV1.Repositorios.VentaRop
 
         }
 
+
+
+
+        public async Task<IEnumerable<VentaDto>> Obtener_Ven_All_por_FechaAsync(BuscarVenta buscarVenta, CancellationToken ct = default)
+        {
+            var fechaBase = buscarVenta?.fecha_venta.Date;
+            DateTime? fechaInicio = fechaBase;
+            DateTime? fechaFin = fechaBase?.AddDays(1);
+
+            var sql = new StringBuilder(@"
+            SELECT
+                v.id_venta,
+                v.id_cliente,
+                v.nombre_vendedor,
+                c.nombre,       
+                v.tipo_venta,
+                v.estado_venta,
+                v.monto_total_Venta,
+                v.fecha_venta    
+            FROM ventas v
+            INNER JOIN clientes c
+                ON v.id_cliente = c.id_cliente  
+            WHERE 1=1 AND v.is_deleted = 0 ");
+
+            int? id_Cliente = buscarVenta?.id_cliente;
+            string? tipo_venta = buscarVenta?.tipo_venta;
+            var parametros = new DynamicParameters();
+
+            if (fechaInicio != null && fechaFin != null)
+            {
+                sql.Append(" AND v.fecha_venta >= @fechaInicio AND v.fecha_venta < @fechaFin");
+                parametros.Add("fechaInicio", fechaInicio, System.Data.DbType.DateTime2);
+                parametros.Add("fechaFin", fechaFin, System.Data.DbType.DateTime2);
+            }
+            if (id_Cliente != null && id_Cliente != 0)
+            {
+                sql.Append(" AND id_cliente = @id_Cliente");
+                parametros.Add("id_Cliente", id_Cliente);
+
+            }
+
+            sql.Append(" ORDER BY v.fecha_venta DESC;");
+
+            using var connection = _sqlconnection.CreateConnection();
+            var ventasPorFecha = await connection.QueryAsync<VentaDto>(
+                    new CommandDefinition(
+                        sql.ToString(), 
+                        parametros, 
+                        cancellationToken: ct
+                    )
+                );
+            return ventasPorFecha.AsList();
+        }
+
+
+
+
         public async Task<IEnumerable<ClienteVentDeudor>> ObtenerClientesConDeudasAsync(CancellationToken ct = default)
         {
             const string sql = @"
@@ -340,7 +411,6 @@ namespace ApiTiendaV1.Repositorios.VentaRop
             var ventas = await connection.QueryAsync<ClienteVentDeudor>(
                     new CommandDefinition(sql, cancellationToken: ct)
                 );
-
             return ventas.AsList();
         }
     }
