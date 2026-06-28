@@ -12,7 +12,7 @@ namespace ApiTiendaV1.Repositorios.Auth
         }
 
         // contar intentos del login
-        public async Task<int> ContarIntentosUltimosMinutos(string email, int minutos = 60) 
+        public async Task<int> ContarIntentosUltimosMinutos(string email, int minutos = 30) 
         {
             const string sql = @"
                 SELECT COUNT(*)
