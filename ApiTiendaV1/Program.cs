@@ -9,10 +9,12 @@ using ApiTiendaV1.Servicios.PagoSrv;
 using ApiTiendaV1.Servicios.PeopleSrv;
 using ApiTiendaV1.Servicios.VentaSrv;
 using ApiTiendaV1.Validation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,7 +27,51 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // JWT
-var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:key"]);
+var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
+
+//
+builder.Services.AddAuthentication( options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+}).AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
+        ),
+
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+
+        ValidateLifetime = true,
+        
+        ClockSkew = TimeSpan.Zero
+    };
+
+    // Leer el JWT desde la cookie HttpOnly
+    options.Events = new JwtBearerEvents {
+        OnMessageReceived = context =>
+        {
+            var token = context.Request.Cookies["access_token"];
+            if (!string.IsNullOrEmpty(token)) {
+                context.Token = token;
+            }
+            return Task.CompletedTask;
+        }
+    };
+});
+
 
 // Base de datos
 builder.Services.AddScoped<ISqlConnectionFactory, SqlConnectionFactory>();
@@ -70,7 +116,7 @@ builder.Services.AddRateLimiter(options =>
 
 
 // CORS
-/*
+
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAstroApp",
         policy =>
@@ -83,7 +129,7 @@ builder.Services.AddCors(options => {
             .AllowAnyMethod()
             .AllowCredentials();
         });
-});*/
+});
 
 
 var app = builder.Build();
