@@ -19,17 +19,17 @@ namespace ApiTiendaV1.Repositorios.Auth
             const string sql = @"
                 SELECT 
                     id_usuario,
-                    nombre_user as nombre,
+                    nombre as nombre,
                     email_user as email,
                     passHass as passhass,
-                    rol_user as rol,
-                    estado_user as estado,
+                    rol_usuario as rol,
+                    estado as estado,
                     telefono as telefono,
                     is_deleted as is_deleted
-                FROM usuario_tbl
+                FROM usuarios
                 WHERE email_user = @email
                     AND is_deleted = 0
-                    AND estado_user = 1
+                    AND estado = 1
             ";
 
             using var connection = _sqlConnectionFactory.CreateConnection();
@@ -47,7 +47,7 @@ namespace ApiTiendaV1.Repositorios.Auth
 
         public async Task<Usuario?> CrearUsuario(Usuario user, IDbTransaction tr = null, CancellationToken ct = default) {
             const string sql = @"
-                INSERT INTO usuario_tbl(
+                INSERT INTO usuarios(
                     nombre_user,
                     email_user,
                     passHass,

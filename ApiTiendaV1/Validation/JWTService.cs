@@ -41,7 +41,7 @@ namespace ApiTiendaV1.Validation
             //crear la llave
             var key = new SymmetricSecurityKey(
                 // convierte a la llave en bytes de los datos de appsettings.json
-                Encoding.UTF8.GetBytes(_config["Jwt:key"])
+                Encoding.UTF8.GetBytes(_config["Jwt:Key"])
             );
             // crea las credenciales de la llave y se firma
             var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -49,7 +49,7 @@ namespace ApiTiendaV1.Validation
 
             // crea el token
             var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issure"],
+                issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Audience"],
                 claims: claims,
                 expires: expiracion,

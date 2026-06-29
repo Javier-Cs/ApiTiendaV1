@@ -14,11 +14,12 @@ namespace ApiTiendaV1.Repositorios.Auth
         // contar intentos del login
         public async Task<int> ContarIntentosUltimosMinutos(string email, int minutos = 30) 
         {
+
             const string sql = @"
                 SELECT COUNT(*)
-                FROM login_attempts
+                FROM login_attempts 
                 WHERE email = @email
-                    AND fecha >=  DATEADD(MINUTE, -@minutos, GETDATE());
+                    AND fecha >= DATEADD(MINUTE, -@minutos, GETDATE());
             ";
 
             using var connection = _sqlConnectionFactory.CreateConnection();
@@ -37,11 +38,12 @@ namespace ApiTiendaV1.Repositorios.Auth
 
         // contar intentos por ip
         public async Task<int> ContarIntentosPorIp(string ip, int minutos = 60) {
+          
             const string sql = @"
                 SELECT COUNT(*)
-                FOM login_attempts
+                FROM login_attempts
                 WHERE ip = @ip
-                AND fecha >= DATEADD(MINUTE, -@minutos, GETDATE())
+                AND fecha >= DATEADD(MINUTE,-@minutos,GETDATE())
             ";
 
             using var connection = _sqlConnectionFactory.CreateConnection();
@@ -54,8 +56,9 @@ namespace ApiTiendaV1.Repositorios.Auth
 
         // guardar intentos fallidos 
         public async Task RegistraIntentosFallidos(string email, string? ip = null) {
+            
             const string sql = @"
-                INSERT INTO login_attempts
+                INSERT INTO  login_attempts
                 (
                     email,
                     fecha,
@@ -65,7 +68,7 @@ namespace ApiTiendaV1.Repositorios.Auth
                     GETDATE(),
                     @ip
                 );
-            ";
+                ";
 
             using var connection = _sqlConnectionFactory.CreateConnection();
             await connection.ExecuteAsync(

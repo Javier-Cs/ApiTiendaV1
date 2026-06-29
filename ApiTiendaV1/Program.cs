@@ -34,12 +34,14 @@ builder.Services.AddScoped<ISqlConnectionFactory, SqlConnectionFactory>();
 builder.Services.AddScoped<IClienteRepo, ClienteRepo>();
 builder.Services.AddScoped<IVentaRepo, VentaRepo>();
 builder.Services.AddScoped<IPagoRepo, PagoRepo>(); 
-builder.Services.AddScoped<UserAuthRepo, UserAuthRepo>();
-builder.Services.AddScoped<ContarIntentosRepo, ContarIntentosRepo>();
+builder.Services.AddScoped<UserAuthRepo>();
+builder.Services.AddScoped<ContarIntentosRepo>();
+builder.Services.AddScoped<JWTService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IVentaService, VentaService>();
 builder.Services.AddScoped<IPagoService, PagoService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
+
 
 builder.Services.Configure<ForwardedHeadersOptions>(
     options =>
@@ -68,7 +70,7 @@ builder.Services.AddRateLimiter(options =>
 
 
 // CORS
-
+/*
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAstroApp",
         policy =>
@@ -81,13 +83,13 @@ builder.Services.AddCors(options => {
             .AllowAnyMethod()
             .AllowCredentials();
         });
-});
+});*/
 
 
 var app = builder.Build();
 
 // Configuracion swagger
-app.UseSwagger();
+app.UseSwagger();   
 
 app.UseSwaggerUI(c =>
 {
@@ -103,14 +105,14 @@ if (app.Environment.IsDevelopment())
 }
 app.UseRouting();
 app.UseCors("AllowAstroApp");
-app.UseMiddleware<CsrfMiddleware>();
+//app.UseMiddleware<CsrfMiddleware>();
 
 
 //user limit
-app.UseRateLimiter();
+//app.UseRateLimiter();
 
 // configuracion de ip
-app.UseForwardedHeaders();
+//app.UseForwardedHeaders();
 
 
 app.UseAuthentication();
