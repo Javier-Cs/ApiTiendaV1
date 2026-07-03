@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ApiTiendaV1.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("dashboard/api/[controller]")]
     public class PeopleDataController : ControllerBase
     {
         /*

@@ -1,12 +1,13 @@
 ﻿using ApiTiendaV1.DTOs;
 using ApiTiendaV1.DTOs.ClienteDt;
 using ApiTiendaV1.Servicios.ClienteSrv;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiTiendaV1.Controllers
 {
     [ApiController]
-    [Route("Api/[controller]")]
+    [Route("dashboard/Api/[controller]")]
     public class ClienteController : ControllerBase
     {
         private readonly IClienteService _clienteService;
@@ -16,8 +17,9 @@ namespace ApiTiendaV1.Controllers
             _clienteService = clienteService;
         }
 
-        // POST: api/clientes
 
+        // POST: api/clientes
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Crear(
             [FromBody] ClienteCrearDto dto,
@@ -27,7 +29,9 @@ namespace ApiTiendaV1.Controllers
             return CreatedAtAction(nameof(ObtenerPorId), new { idCliente = id }, new { id });
         }
 
+
         // GET: api/clientes
+        [Authorize]
         [HttpGet("All")]
         public async Task<IActionResult> ObtenerTodos(CancellationToken ct)
         {
@@ -35,7 +39,9 @@ namespace ApiTiendaV1.Controllers
             return Ok(clientes);
         }
 
+
         // GET: api/clientes/{idCliente}
+        [Authorize]
         [HttpGet("{idCliente:int}")]
         public async Task<IActionResult> ObtenerPorId(
             int idCliente,
@@ -59,7 +65,9 @@ namespace ApiTiendaV1.Controllers
             }
         }
 
+
         // PUT: api/clientes/{idCliente}
+        [Authorize]
         [HttpPut("{idCliente:int}")]
         public async Task<IActionResult> Actualizar(
             int idCliente,
@@ -70,7 +78,9 @@ namespace ApiTiendaV1.Controllers
             return NoContent();
         }
 
+
         // DELETE: api/clientes/{idCliente}
+        [Authorize]
         [HttpDelete("{idCliente:int}")]
         public async Task<IActionResult> Eliminar(
             int idCliente,
@@ -80,6 +90,7 @@ namespace ApiTiendaV1.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [HttpGet("estado/{estadoCliente:bool}/deuda/{tipocliente}")]
         public async Task<IActionResult> ObtenerTodosLosEstados(
             bool estadoCliente,
@@ -90,12 +101,16 @@ namespace ApiTiendaV1.Controllers
             return Ok(cliente);
         }
 
+
+        [Authorize]
         [HttpOptions]
         public IActionResult Options()
         {
-            return Ok();
+            return Ok(); 
         }
 
+
+        [Authorize]
         [HttpGet("buscar")]
         public async Task<IActionResult> BuscarCliente([FromQuery]string nombre,CancellationToken ct){
             if (string.IsNullOrWhiteSpace(nombre) || nombre.Length < 2)

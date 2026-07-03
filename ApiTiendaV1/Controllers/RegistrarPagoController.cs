@@ -2,12 +2,13 @@
 using ApiTiendaV1.DTOs.DeudasPorPagarDto;
 using ApiTiendaV1.DTOs.VentaDt;
 using ApiTiendaV1.Servicios.PagoSrv;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiTiendaV1.Controllers
 {
     [ApiController]
-    [Route("Api/[Controller]")]
+    [Route("dashboard/Api/[Controller]")]
     public class RegistrarPagoController : ControllerBase
     {
         private readonly IPagoService _pagoService;
@@ -17,6 +18,7 @@ namespace ApiTiendaV1.Controllers
         }
 
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> RegistrarVentasPagadas(
             [FromBody] ReporteClientePagoDto reporteClienteVentaDto
@@ -37,7 +39,7 @@ namespace ApiTiendaV1.Controllers
 
 
 
-
+        [Authorize]
         [HttpPost("Pagar-ventas-deuda")]
         public async Task<IActionResult> RegistraVentasConDeudaAPagar([FromBody] VentasAPagarConDeudaDto deudaVenta, CancellationToken ct) {
             try

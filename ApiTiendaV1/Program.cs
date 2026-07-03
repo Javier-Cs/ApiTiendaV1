@@ -124,7 +124,8 @@ builder.Services.AddCors(options => {
             policy.WithOrigins(
                 "http://localhost:4321",
                 "https://legumfrutsa.com",
-                "https://legumfrutsa.com/dash")
+                "https://apioper.legumfrutsa.com",
+                "https://legumfrutsa.com")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
