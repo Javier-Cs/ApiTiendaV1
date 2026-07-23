@@ -81,7 +81,7 @@ namespace ApiTiendaV1.Servicios.AuthSrv
                 await _contarIntentosRepo.LimpiarIntentos(loginDto.Email);
             }
 
-            var expiracion = DateTime.UtcNow.AddMinutes(60);
+            var expiracion = DateTime.Now.AddMinutes(60);
             var token = _jwtService.GenerarToken(respuesta, expiracion);
 
             return new SLUsuarioLoginDto
