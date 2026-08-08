@@ -7,6 +7,7 @@ using ApiTiendaV1.Servicios.AuthSrv;
 using ApiTiendaV1.Servicios.ClienteSrv;
 using ApiTiendaV1.Servicios.PagoSrv;
 using ApiTiendaV1.Servicios.PeopleSrv;
+using ApiTiendaV1.Servicios.Streams;
 using ApiTiendaV1.Servicios.VentaSrv;
 using ApiTiendaV1.Validation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -28,6 +29,12 @@ builder.Services.AddSwaggerGen();
 
 // JWT
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
+
+builder.Services.AddHttpClient<StreamService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(15);
+});
+
 
 //
 builder.Services.AddAuthentication( options =>
@@ -125,7 +132,9 @@ builder.Services.AddCors(options => {
                 "http://localhost:4321",
                 "https://legumfrutsa.com",
                 "https://apioper.legumfrutsa.com",
-                "https://legumfrutsa.com")
+                "https://legumfrutsa.com",
+                "http://localhost:4200",
+                "https://radiosys.legumfrutsa.com")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
