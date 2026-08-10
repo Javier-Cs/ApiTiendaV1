@@ -31,7 +31,10 @@ namespace ApiTiendaV1.Controllers
 
             }
             catch (Exception ex) {
-                return BadRequest(ex.ToString());
+                return Problem(
+                   detail: ex.ToString(),
+                   statusCode: 500
+               );
             }
         }
     }
