@@ -134,7 +134,8 @@ builder.Services.AddCors(options => {
                 "https://apioper.legumfrutsa.com",
                 "https://legumfrutsa.com",
                 "http://localhost:4200",
-                "https://radiosys.legumfrutsa.com")
+                "https://radiosys.legumfrutsa.com",
+                "https://borrador.cedesystem.com")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();

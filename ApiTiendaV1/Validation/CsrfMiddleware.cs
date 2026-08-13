@@ -25,7 +25,8 @@
                     origin != "http://localhost:4321" &&
                     origin != "https://localhost:44313"&&
                     origin != "http://localhost:4200" &&
-                    origin != "https://radiosys.legumfrutsa.com"
+                    origin != "https://radiosys.legumfrutsa.com" &&
+                    origin != "https://borrador.cedesystem.com"
                     ) {
                     context.Response.StatusCode = 403;
                     await context.Response.WriteAsync("No compa, su peticion de este origen no esta permitido");
