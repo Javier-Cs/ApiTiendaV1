@@ -19,6 +19,7 @@ namespace ApiTiendaV1.Repositorios.PagoRop
         }
         
         
+        
         public async Task<List<ValoresVentasDto>> ObtenerValoresVentasAsync(ValoresConsultVentasDto valores, CancellationToken ct = default) {  
             const string sql = @"
                 select 
@@ -48,7 +49,7 @@ namespace ApiTiendaV1.Repositorios.PagoRop
             return resultados.ToList();
         }
 
-
+        /*
         public async Task CrearPagoAsync(ReporteClientePagoDto dto, CancellationToken ct = default)
         {
 
@@ -78,7 +79,7 @@ namespace ApiTiendaV1.Repositorios.PagoRop
                         @monto_total_Venta,
                         @vuelto,
                         @numeroVentas)
-                    select cast(scope_identity() as int);";
+                    select cast(scope_identity() as int);";*/
 
                 /*
                  * nombre_cliente,
@@ -91,6 +92,7 @@ namespace ApiTiendaV1.Repositorios.PagoRop
                         @descripcion_de_pago)
                  */
 
+        /*
                 var idPago = await connection.ExecuteScalarAsync<int>(
                     sqlPago,
                     new
@@ -154,186 +156,188 @@ namespace ApiTiendaV1.Repositorios.PagoRop
 
             }
 
-        }
+        }*/
 
 
         public async Task PagarDeudas(
-     VentasAPagarConDeudaDto dto,
-     CancellationToken ct)
-        {
-            using var connection = _sqlconnection.CreateConnection();
 
-            connection.Open();
+             VentasAPagarConDeudaDto dto,
+             CancellationToken ct)
 
-            using var tx = connection.BeginTransaction();
-
-            try
             {
-                // Obtener ids enviados
-                var idsVentas = dto.lista_ventas
-                    .Select(x => x.id_venta)
-                    .ToList();
+                using var connection = _sqlconnection.CreateConnection();
 
-                // Consultar las ventas reales en la BD
-                const string sqlVentas = @"
-                SELECT
-                    id_venta,
-                    id_cliente,
-                    monto_total_Venta,
-                    estado_venta
-                FROM ventas
-                WHERE id_venta IN @ids
-                AND is_deleted = 0";
+                connection.Open();
 
-                var ventas = (
-                    await connection.QueryAsync<dynamic>(
-                        sqlVentas,
-                        new { ids = idsVentas },
-                        tx
-                    )
-                ).ToList();
+                using var tx = connection.BeginTransaction();
 
-                if (!ventas.Any())
-                    throw new Exception("No se encontraron ventas.");
-
-                // Validar que todas estén en deuda
-                if (ventas.Any(v => v.estado_venta != "DEUDA"))
-                    throw new Exception(
-                        "Existen ventas que no están en estado DEUDA."
-                    );
-
-                // Validar que todas las ventas pertenezcan al mismo cliente
-                var clientes = ventas
-                    .Select(v => (int)v.id_cliente)
-                    .Distinct()
-                    .ToList();
-
-                if (clientes.Count > 1)
-                    throw new Exception(
-                        "Las ventas pertenecen a diferentes clientes."
-                    );
-
-                var numeroDeVentas = dto.lista_ventas.Count;
-
-                var valorTotalDeTodasLasventas =
-                    dto.lista_ventas.Sum(x => x.monto_total_Venta);
-
-                var vueltoTotal =
-                    dto.efectivo_recibido -
-                    valorTotalDeTodasLasventas;
-
-                if (vueltoTotal < 0)
-                    throw new Exception(
-                        "El efectivo recibido es insuficiente."
-                    );
-
-                // Cabecera
-                const string sqlCabecera = @"
-                INSERT INTO reporte_pago_venta(
-                    idcliente,
-                    nombre_vendedor,
-                    descripcion_pago,
-                    numero_ventas,
-                    monto_total,
-                    efectivo_recibido,
-                    vuelto,
-                    fecha_pago
-                )
-                VALUES(
-                    @idcliente,
-                    @nombre_vendedor,
-                    @descripcion,
-                    @numeroDeVentas,
-                    @montoTotal,
-                    @efectivo,
-                    @vuelto,
-                    @fechaPago
-                )
-
-                SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-                var idReporte =
-                    await connection.ExecuteScalarAsync<int>(
-                        sqlCabecera,
-                        new
-                        {
-                            idcliente = dto.cliente.id_cliente,
-
-                            nombre_vendedor =
-                                dto.nombre_vendedor,
-
-                            descripcion =
-                                dto.descripcion_de_pago,
-
-                            numeroDeVentas,
-
-                            montoTotal =
-                                valorTotalDeTodasLasventas,
-
-                            efectivo =
-                                dto.efectivo_recibido,
-
-                            vuelto =
-                                vueltoTotal,
-
-                            fechaPago =
-                                dto.fechaPago ?? DateTime.Now
-                        },
-                        tx
-                    );
-
-                // Detalle
-                const string sqlDetalle = @"
-                INSERT INTO detalle_reporte_pago_venta(
-                    id_reporte_pago,
-                    id_venta,
-                    monto_venta
-                )
-                VALUES(
-                    @idReporte,
-                    @idVenta,
-                    @monto
-                )";
-
-                foreach (var venta in dto.lista_ventas)
+                try
                 {
+                    // Obtener ids enviados
+                    var idsVentas = dto.lista_ventas
+                        .Select(x => x.id_venta)
+                        .ToList();
+
+                    // Consultar las ventas reales en la BD
+                    const string sqlVentas = @"
+                    SELECT
+                        id_venta,
+                        id_cliente,
+                        monto_total_Venta,
+                        estado_venta
+                    FROM ventas
+                    WHERE id_venta IN @ids
+                    AND is_deleted = 0";
+
+                    var ventas = (
+                        await connection.QueryAsync<dynamic>(
+                            sqlVentas,
+                            new { ids = idsVentas },
+                            tx
+                        )
+                    ).ToList();
+
+                    if (!ventas.Any())
+                        throw new Exception("No se encontraron ventas.");
+
+                    // Validar que todas estén en deuda
+                    if (ventas.Any(v => v.estado_venta != "DEUDA"))
+                        throw new Exception(
+                            "Existen ventas que no están en estado DEUDA."
+                        );
+
+                    // Validar que todas las ventas pertenezcan al mismo cliente
+                    var clientes = ventas
+                        .Select(v => (int)v.id_cliente)
+                        .Distinct()
+                        .ToList();
+
+                    if (clientes.Count > 1)
+                        throw new Exception(
+                            "Las ventas pertenecen a diferentes clientes."
+                        );
+
+                    var numeroDeVentas = dto.lista_ventas.Count;
+
+                    var valorTotalDeTodasLasventas =
+                        dto.lista_ventas.Sum(x => x.monto_total_Venta);
+
+                    var vueltoTotal =
+                        dto.efectivo_recibido -
+                        valorTotalDeTodasLasventas;
+
+                    if (vueltoTotal < 0)
+                        throw new Exception(
+                            "El efectivo recibido es insuficiente."
+                        );
+
+                    // Cabecera
+                    const string sqlCabecera = @"
+                    INSERT INTO reporte_pago_venta(
+                        idcliente,
+                        nombre_vendedor,
+                        descripcion_pago,
+                        numero_ventas,
+                        monto_total,
+                        efectivo_recibido,
+                        vuelto,
+                        fecha_pago
+                    )
+                    VALUES(
+                        @idcliente,
+                        @nombre_vendedor,
+                        @descripcion,
+                        @numeroDeVentas,
+                        @montoTotal,
+                        @efectivo,
+                        @vuelto,
+                        @fechaPago
+                    )
+
+                    SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+                    var idReporte =
+                        await connection.ExecuteScalarAsync<int>(
+                            sqlCabecera,
+                            new
+                            {
+                                idcliente = dto.cliente.id_cliente,
+
+                                nombre_vendedor =
+                                    dto.nombre_vendedor,
+
+                                descripcion =
+                                    dto.descripcion_de_pago,
+
+                                numeroDeVentas,
+
+                                montoTotal =
+                                    valorTotalDeTodasLasventas,
+
+                                efectivo =
+                                    dto.efectivo_recibido,
+
+                                vuelto =
+                                    vueltoTotal,
+
+                                fechaPago =
+                                    dto.fechaPago ?? DateTime.Now
+                            },
+                            tx
+                        );
+
+                    // Detalle
+                    const string sqlDetalle = @"
+                    INSERT INTO detalle_reporte_pago_venta(
+                        id_reporte_pago,
+                        id_venta,
+                        monto_venta
+                    )
+                    VALUES(
+                        @idReporte,
+                        @idVenta,
+                        @monto
+                    )";
+
+                    foreach (var venta in dto.lista_ventas)
+                    {
+                        await connection.ExecuteAsync(
+                            sqlDetalle,
+                            new
+                            {
+                                idReporte,
+                                idVenta = venta.id_venta,
+                                monto = venta.monto_total_Venta
+                            },
+                            tx
+                        );
+                    }
+
+                    // Actualizar ventas
+                    const string sqlActualizar = @"
+                    UPDATE ventas
+                    SET estado_venta = 'PAGADO'
+                    WHERE id_venta IN @ids
+                    AND estado_venta = 'DEUDA'
+                    AND is_deleted = 0";
+
                     await connection.ExecuteAsync(
-                        sqlDetalle,
+                        sqlActualizar,
                         new
                         {
-                            idReporte,
-                            idVenta = venta.id_venta,
-                            monto = venta.monto_total_Venta
+                            ids = idsVentas
                         },
                         tx
                     );
+
+                    tx.Commit();
                 }
-
-                // Actualizar ventas
-                const string sqlActualizar = @"
-                UPDATE ventas
-                SET estado_venta = 'PAGADO'
-                WHERE id_venta IN @ids
-                AND estado_venta = 'DEUDA'
-                AND is_deleted = 0";
-
-                await connection.ExecuteAsync(
-                    sqlActualizar,
-                    new
-                    {
-                        ids = idsVentas
-                    },
-                    tx
-                );
-
-                tx.Commit();
+                catch
+                {
+                    tx.Rollback();
+                    throw;
+                }
             }
-            catch
-            {
-                tx.Rollback();
-                throw;
-            }
-        }
     }
 
 }

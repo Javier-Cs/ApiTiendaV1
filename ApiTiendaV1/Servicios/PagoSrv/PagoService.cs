@@ -13,6 +13,7 @@ namespace ApiTiendaV1.Servicios.PagoSrv
         {
             _pagoRepo = pagoRepo;
         }
+        /*
         public Task CrearPagoseAsync (ReporteClientePagoDto dto, CancellationToken ct = default)
         {
             if (dto == null || !dto.lista_id_vents.Any()) {
@@ -22,9 +23,7 @@ namespace ApiTiendaV1.Servicios.PagoSrv
                 throw new Exception("El efectivo recibido es menor al monto total de la venta");
             }
             return _pagoRepo.CrearPagoAsync(dto, ct);
-
-
-        }
+        }*/
 
         public Task PagarDeudasVenta(VentasAPagarConDeudaDto dto, CancellationToken ct = default)
         {

@@ -6,17 +6,16 @@ using ApiTiendaV1.Repositorios.VentaRop;
 using ApiTiendaV1.Servicios.AuthSrv;
 using ApiTiendaV1.Servicios.ClienteSrv;
 using ApiTiendaV1.Servicios.PagoSrv;
-using ApiTiendaV1.Servicios.PeopleSrv;
 using ApiTiendaV1.Servicios.Streams;
 using ApiTiendaV1.Servicios.VentaSrv;
 using ApiTiendaV1.Validation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +25,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 
 // JWT
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
@@ -159,6 +159,10 @@ app.UseSwaggerUI(c =>
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
+    //app.MapOpenApi();
+
+    // implementar scalar
+    //app.MapScalarApiReference();
 }
 app.UseRouting();
 app.UseCors("AllowAstroApp");

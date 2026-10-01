@@ -133,7 +133,7 @@ namespace ApiTiendaV1.Servicios.VentaSrv
             
             if (buscarVenta.tipo_venta != "CONTADO" && buscarVenta.tipo_venta != "CREDITO")
             {
-                throw new ArgumentException(" El tipo ingresadob es invalido");
+                throw new ArgumentException(" El tipo ingresado es invalido");
             }
             return await _ventaRepo.Obtener_Ven_por_FechaAsync(buscarVenta, ct);
         }

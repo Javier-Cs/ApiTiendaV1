@@ -6,7 +6,7 @@ namespace ApiTiendaV1.Repositorios.PagoRop
 {
     public interface IPagoRepo
     {
-        Task CrearPagoAsync(ReporteClientePagoDto dto, CancellationToken ct = default);
+        //Task CrearPagoAsync(ReporteClientePagoDto dto, CancellationToken ct = default);
         Task<List<ValoresVentasDto>> ObtenerValoresVentasAsync(ValoresConsultVentasDto valores, CancellationToken ct = default);
         Task PagarDeudas(VentasAPagarConDeudaDto dto, CancellationToken ct);
     }

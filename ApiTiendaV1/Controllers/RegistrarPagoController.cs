@@ -19,33 +19,12 @@ namespace ApiTiendaV1.Controllers
 
 
         [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> RegistrarVentasPagadas(
-            [FromBody] ReporteClientePagoDto reporteClienteVentaDto
-            , CancellationToken ct)
-        {
-
-            try
-            {
-                await _pagoService.CrearPagoseAsync(reporteClienteVentaDto, ct);
-                return Ok(new { message = "pago registrado correctamente." });
-
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = $"Error al registrar el pago: {ex.Message}" });
-            }
-        }
-
-
-
-        [Authorize]
         [HttpPost("Pagar-ventas-deuda")]
         public async Task<IActionResult> RegistraVentasConDeudaAPagar([FromBody] VentasAPagarConDeudaDto deudaVenta, CancellationToken ct) {
             try
             {
                 await _pagoService.PagarDeudasVenta(deudaVenta, ct);
-                return Ok(new { message = "pago registrado correctamente." });
+                return Ok(new { message = "pago registrado correctamente."});
             }
             catch(Exception ex) {
                 return BadRequest(new { message = $"Error al registrar el pago: {ex.Message}" });
